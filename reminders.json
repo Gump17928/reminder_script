@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Timecard",
+    "time": "16:30",
+    "message": "Put in your time for work today!",
+    "days": ["Mon", "Tue", "Wed", "Thu", "Fri"]
+  },
+  {
+    "name": "Mid-day check",
+    "time": "12:00",
+    "message": "Quick check: is your time up to date?",
+    "enabled": false
+  }
+]
