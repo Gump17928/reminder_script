@@ -1,14 +1,23 @@
 [
   {
     "name": "Timecard",
-    "time": "16:30",
+    "time": "15:00",
+    "every": 30,
+    "until": "17:00",
     "message": "Put in your time for work today!",
     "days": ["Mon", "Tue", "Wed", "Thu", "Fri"]
   },
   {
     "name": "Mid-day check",
-    "time": "12:00",
+    "time": ["10:00", "12:00"],
     "message": "Quick check: is your time up to date?",
+    "enabled": false
+  },
+  {
+    "name": "Escalating example",
+    "time": "16:00",
+    "every": [30, 15, 5],
+    "until": "17:00",
     "enabled": false
   }
 ]
