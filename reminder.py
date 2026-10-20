@@ -1,7 +1,11 @@
 """Pop-up reminders with a chime. Configure them in reminders.json."""
+import io
 import json
+import math
+import struct
 import threading
 import tkinter as tk
+import wave
 import winsound
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -10,17 +14,49 @@ HERE = Path(__file__).parent
 CONFIG, STATE = HERE / "reminders.json", HERE / "state.json"
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 SNOOZE_MIN = 10
-CHIME = [(523, 180), (659, 180), (784, 350)]
+VOLUME = 0.25  # 0.0-1.0; override per reminder with "volume"
+NOTES = [(523.25, 0.0), (659.25, 0.35), (783.99, 0.7)]  # (Hz, start seconds): C-E-G
+RATE, LENGTH, ATTACK = 22050, 3.0, 0.08  # sample rate, total seconds, fade-in seconds
 
 
-def chime():
-    def play():
-        for freq, ms in CHIME * 2:
-            winsound.Beep(freq, ms)
-    threading.Thread(target=play, daemon=True).start()
+def synth(volume):
+    """Soft bell: sine notes with a smooth fade-in and a long exponential fade-out."""
+    n = int(RATE * LENGTH)
+    buf = [0.0] * n
+    for freq, start in NOTES:
+        for i in range(int(start * RATE), n):
+            t = i / RATE - start
+            env = math.sin(min(t / ATTACK, 1) * math.pi / 2) ** 2 * math.exp(-2.2 * t)
+            buf[i] += env * (math.sin(2 * math.pi * freq * t) + 0.25 * math.sin(4 * math.pi * freq * t))
+    peak = max(map(abs, buf)) or 1
+    fade = int(RATE * 0.2)  # guarantee silence at the very end
+    pcm = b"".join(struct.pack("<h", int(32767 * volume * s / peak * min(1, (n - i) / fade)))
+                   for i, s in enumerate(buf))
+    out = io.BytesIO()
+    with wave.open(out, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes(pcm)
+    return out.getvalue()
 
 
-def popup(root, title, message, on_snooze):
+_cache = {}
+
+
+def chime(r):
+    """Play r["sound"] (a .wav path) if given, else the synthesized bell at r["volume"]."""
+    sound = r.get("sound")
+    if sound and (HERE / sound).is_file():
+        data = (HERE / sound).read_bytes()
+    else:
+        vol = r.get("volume", VOLUME)
+        data = _cache.setdefault(vol, synth(vol))
+    threading.Thread(target=winsound.PlaySound, args=(data, winsound.SND_MEMORY), daemon=True).start()
+
+
+def popup(root, r, on_snooze):
+    title, message = r["name"], r.get("message", r["name"])
     win = tk.Toplevel(root)
     win.title(title)
     win.attributes("-topmost", True)
@@ -38,7 +74,7 @@ def popup(root, title, message, on_snooze):
     win.geometry(f"+{x}+{y}")
     win.lift()
     win.focus_force()
-    chime()
+    chime(r)
 
 
 def load(path, default):
@@ -81,7 +117,7 @@ def main():
 
     def show(r):
         name = r["name"]
-        popup(root, name, r.get("message", name),
+        popup(root, r,
               lambda: snoozed.update({name: datetime.now() + timedelta(minutes=SNOOZE_MIN)}))
 
     def tick():
