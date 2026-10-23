@@ -1,2 +1,7 @@
 state.json
+reminders.json
+reminders.tmp
+error.log
 __pycache__/
+sounds/*
+!sounds/README.txt

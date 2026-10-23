@@ -1,0 +1,91 @@
+{
+  "settings": {
+    "snooze_minutes": 10,
+    "volume": 0.25,
+    "sound": "Soft Bell"
+  },
+  "reminders": [
+    {
+      "id": "example1",
+      "name": "Timecard",
+      "enabled": true,
+      "message": "Put in your time for work today!",
+      "time": [
+        "15:00"
+      ],
+      "days": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
+      ],
+      "every": [
+        30
+      ],
+      "until": "17:00",
+      "link": "https://example.com/timecard",
+      "link_label": "Open timecard site",
+      "confirm": true,
+      "confirm_label": "I filled out my time",
+      "snooze_minutes": 10,
+      "volume": 0.25,
+      "sound": "Soft Bell"
+    },
+    {
+      "id": "example2",
+      "name": "Mid-day check",
+      "enabled": false,
+      "message": "Quick check: is your time up to date?",
+      "time": [
+        "10:00",
+        "12:00"
+      ],
+      "days": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
+      ],
+      "every": [],
+      "until": "23:59",
+      "link": "",
+      "link_label": "Open timecard site",
+      "confirm": false,
+      "confirm_label": "I filled out my time",
+      "snooze_minutes": 10,
+      "volume": 0.25,
+      "sound": "Soft Bell"
+    },
+    {
+      "id": "example3",
+      "name": "Escalating example",
+      "enabled": false,
+      "message": "",
+      "time": [
+        "16:00"
+      ],
+      "days": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
+      ],
+      "every": [
+        30,
+        15,
+        5
+      ],
+      "until": "17:00",
+      "link": "",
+      "link_label": "Open timecard site",
+      "confirm": false,
+      "confirm_label": "I filled out my time",
+      "snooze_minutes": 10,
+      "volume": 0.25,
+      "sound": "Rising Tone"
+    }
+  ]
+}

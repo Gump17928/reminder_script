@@ -2,6 +2,8 @@
 rem Starts the reminder with no console window. Installs Python for the current user (no admin) if needed.
 setlocal
 cd /d "%~dp0"
+set "ARGS=%*"
+if not defined ARGS set "ARGS=reminder.py"
 if not defined PY_DIR set "PY_DIR=%LocalAppData%\Programs\Python\Python312"
 if not defined PY_URL set "PY_URL=https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe"
 
@@ -11,7 +13,7 @@ if not defined PYW (
     powershell -NoProfile -Command "Add-Type -AssemblyName PresentationFramework; [void][Windows.MessageBox]::Show('Reminder script: could not find or install Python. Check your internet connection, or install Python 3 from python.org.','Reminder script','OK','Error')"
     exit /b 1
 )
-start "" "%PYW%" reminder.py
+start "" "%PYW%" %ARGS%
 exit /b 0
 
 :find
