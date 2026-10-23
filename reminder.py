@@ -2,6 +2,7 @@
 import io
 import json
 import math
+import socket
 import struct
 import threading
 import tkinter as tk
@@ -110,6 +111,12 @@ def occurrences(r):
 
 
 def main():
+    # Single instance: a second copy exits if the port is already held
+    lock = socket.socket()
+    try:
+        lock.bind(("127.0.0.1", 47653))
+    except OSError:
+        return
     root = tk.Tk()
     root.withdraw()
     fired = load(STATE, {})  # reminder name -> [date, last occurrence shown (minutes)]
